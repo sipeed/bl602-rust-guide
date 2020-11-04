@@ -11,5 +11,10 @@ fn main() -> ! {
     let parts = dp.GLB.split();
     let mut gpio5 = parts.pin5.into_push_pull_output();
     gpio5.try_set_high().unwrap();
-    loop {}
+    loop {
+        use riscv::register::mcycle;
+        let t0 = mcycle::read64();
+        while mcycle::read64().wrapping_sub(t0) <= 50_000_000 { }
+        gpio5.try_toggle().unwrap();
+    }
 }
