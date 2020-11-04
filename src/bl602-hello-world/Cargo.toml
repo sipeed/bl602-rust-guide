@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 riscv-rt = "*"
 bl602-hal = { path = "../../../bl602-hal" }
+panic-halt = "*"
