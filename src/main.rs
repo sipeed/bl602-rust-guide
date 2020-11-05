@@ -31,18 +31,21 @@ fn main() -> ! {
         .cr_uart_bit_inv().clear_bit()
     );
     // 8N1
-    let data_bits = 8;
-    let stop_bits = 1;
+    /* 4->5b 5->6b 6->7b 7->8b */
+    let data_bits_cfg = 7; // 8 bits
+    /* 1->1b 2->1.5b 3->2b */
+    let stop_bits_cfg = 1;
     dp.UART.utx_config.write(|w| unsafe { w
         .cr_utx_prt_en().clear_bit() // parity: none
-        .cr_utx_bit_cnt_d().bits(data_bits + 4)
-        .cr_utx_bit_cnt_p().bits(stop_bits + 1) 
+        .cr_utx_bit_cnt_d().bits(data_bits_cfg)
+        .cr_utx_bit_cnt_p().bits(stop_bits_cfg) 
+        .cr_utx_frm_en().set_bit() // freerun on
         .cr_utx_cts_en().clear_bit() // no CTS
         .cr_utx_en().set_bit() // enable TX
     });
     dp.UART.urx_config.write(|w| unsafe { w
         .cr_urx_prt_en().clear_bit() // parity: none
-        .cr_urx_bit_cnt_d().bits(data_bits + 4)
+        .cr_urx_bit_cnt_d().bits(data_bits_cfg)
         .cr_urx_deg_en().clear_bit() // no rx input de-glitch
         .cr_urx_rts_sw_mode().clear_bit() // no RTS
         .cr_urx_en().set_bit() // enable RX
