@@ -16,7 +16,7 @@ fn main() -> ! {
         .uart_clk_en().set_bit()
     });
     // calculate baudrate
-    let baudrate_divisor = 20;  // 160M / 4 / 20 = 2M baud
+    let baudrate_divisor = 2000;  // 160M / 4 / 2000 = 20K baud
     dp.UART.uart_bit_prd.write(|w| unsafe { w
         .cr_urx_bit_prd().bits(baudrate_divisor - 1)
         .cr_utx_bit_prd().bits(baudrate_divisor - 1)
@@ -29,9 +29,11 @@ fn main() -> ! {
     /* 4->5b 5->6b 6->7b 7->8b */
     let data_bits_cfg = 7; // 8 bits
     /* 1->1b 2->1.5b 3->2b */
-    let stop_bits_cfg = 1;
+    let stop_bits_cfg = 1; // todo: check this parameter
     dp.UART.utx_config.write(|w| unsafe { w
         .cr_utx_prt_en().clear_bit() // parity: none
+        // .cr_utx_prt_en().set_bit() // parity: yes
+        // .cr_utx_prt_sel().set_bit() // parity: odd
         .cr_utx_bit_cnt_d().bits(data_bits_cfg)
         .cr_utx_bit_cnt_p().bits(stop_bits_cfg) 
         .cr_utx_frm_en().set_bit() // freerun on
