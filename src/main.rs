@@ -9,19 +9,14 @@ use panic_halt as _;
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
     // enable clock
-    let clock = 160_000_000 as u32;
-    let uart_clk_div = 160_000_000 / clock;
+    // let clock = 160_000_000 as u32;
+    let uart_clk_div = 3; // reset
     dp.GLB.clk_cfg2.write(|w| unsafe { w
-        .uart_clk_div().bits(uart_clk_div as u8)
+        .uart_clk_div().bits(uart_clk_div)
         .uart_clk_en().set_bit()
     });
     // calculate baudrate
-    let baudrate = 115200 as u32;
-    let fraction = ((clock * 10 / baudrate) % 10) as u16;
-    let mut baudrate_divisor = (clock / baudrate) as u16;
-    if fraction >= 5 { 
-        baudrate_divisor += 1; 
-    }
+    let baudrate_divisor = 20;  // 160M / 4 / 20 = 2M baud
     dp.UART.uart_bit_prd.write(|w| unsafe { w
         .cr_urx_bit_prd().bits(baudrate_divisor - 1)
         .cr_utx_bit_prd().bits(baudrate_divisor - 1)
@@ -76,7 +71,20 @@ fn main() -> ! {
     loop {
         // write data
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
-            w.bits(b'H' as u32)
-        })
+            w.bits(b'R' as u32)
+        });
+        dp.UART.uart_fifo_wdata.write(|w| unsafe {
+            w.bits(b'U' as u32)
+        });
+        dp.UART.uart_fifo_wdata.write(|w| unsafe {
+            w.bits(b'S' as u32)
+        });
+        dp.UART.uart_fifo_wdata.write(|w| unsafe {
+            w.bits(b'T' as u32)
+        });
     }
 }
+// MIQU??
+// 4D495155
+// RUST
+// 52555354
