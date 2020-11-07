@@ -75,18 +75,18 @@ fn main() -> ! {
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'R' as u32)
         });
+        while dp.UART.uart_status.read().sts_utx_bus_busy().bit_is_set() {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'U' as u32)
         });
+        while dp.UART.uart_status.read().sts_utx_bus_busy().bit_is_set() {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'S' as u32)
         });
+        while dp.UART.uart_status.read().sts_utx_bus_busy().bit_is_set() {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'T' as u32)
         });
+        while dp.UART.uart_status.read().sts_utx_bus_busy().bit_is_set() {}
     }
 }
-// MIQU??
-// 4D495155
-// RUST
-// 52555354
