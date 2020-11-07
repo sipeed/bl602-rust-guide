@@ -34,8 +34,7 @@ fn main() -> ! {
         .cr_utx_prt_en().clear_bit() // parity: none
         .cr_utx_bit_cnt_d().bits(data_bits_cfg)
         .cr_utx_bit_cnt_p().bits(stop_bits_cfg) 
-        // .cr_utx_frm_en().set_bit() // freerun on
-        // // freerun off
+        .cr_utx_frm_en().clear_bit() // [!] freerun off
         .cr_utx_cts_en().clear_bit() // no CTS
         .cr_utx_en().set_bit() // enable TX
     });
@@ -69,21 +68,20 @@ fn main() -> ! {
         .uart_sig_0_sel().bits(2) // tx -> GLB_UART_SIG_FUN_UART0_TXD
         .uart_sig_7_sel().bits(3) // rx -> GLB_UART_SIG_FUN_UART0_RXD
     });
+    // todo: fifo
+    dp.UART.uart_fifo_config_0.modify(|_, w| w.tx_fifo_clr().set_bit());
     loop {
         // write data
         while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() < 1 {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'R' as u32)
         });
-        while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() < 1 {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'U' as u32)
         });
-        while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() < 1 {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'S' as u32)
         });
-        while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() < 1 {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'T' as u32)
         });
