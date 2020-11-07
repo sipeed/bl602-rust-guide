@@ -28,14 +28,14 @@ fn main() -> ! {
     // 8N1
     /* 4->5b 5->6b 6->7b 7->8b */
     let data_bits_cfg = 7; // 8 bits
-    /* 1->1b 2->1.5b 3->2b */
+    /* 0->0.5b 1->1b 2->1.5b 3->2b */
     let stop_bits_cfg = 1; // todo: check this parameter
     dp.UART.utx_config.write(|w| unsafe { w
         .cr_utx_prt_en().clear_bit() // parity: none
         .cr_utx_bit_cnt_d().bits(data_bits_cfg)
         .cr_utx_bit_cnt_p().bits(stop_bits_cfg) 
-        .cr_utx_frm_en().set_bit() // freerun on
-        // freerun off
+        // .cr_utx_frm_en().set_bit() // freerun on
+        // // freerun off
         .cr_utx_cts_en().clear_bit() // no CTS
         .cr_utx_en().set_bit() // enable TX
     });
