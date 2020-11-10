@@ -69,10 +69,12 @@ fn main() -> ! {
         .uart_sig_7_sel().bits(3) // rx -> GLB_UART_SIG_FUN_UART0_RXD
     });
     // todo: fifo
-    dp.UART.uart_fifo_config_0.modify(|_, w| w.tx_fifo_clr().set_bit());
+    dp.UART.uart_fifo_config_1.modify(|_, w| unsafe { w
+        .tx_fifo_th().bits(16 - 1)
+    });
     loop {
         // write data
-        while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() < 1 {}
+        // while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() == 0 {}
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'R' as u32)
         });
@@ -85,5 +87,6 @@ fn main() -> ! {
         dp.UART.uart_fifo_wdata.write(|w| unsafe {
             w.bits(b'T' as u32)
         });
+        while dp.UART.uart_status.read().sts_utx_bus_busy().bit_is_set() {}
     }
 }
