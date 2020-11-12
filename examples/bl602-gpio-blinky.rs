@@ -9,7 +9,7 @@ use panic_halt as _;
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
     let parts = dp.GLB.split();
-    let mut gpio5 = parts.pin5.into_push_pull_output();
+    let mut gpio5 = parts.pin5.into_pull_down_output();
     gpio5.try_set_high().unwrap();
     loop {
         use riscv::register::mcycle;

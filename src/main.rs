@@ -35,6 +35,7 @@ fn main() -> ! {
         .cr_utx_bit_cnt_d().bits(data_bits_cfg)
         .cr_utx_bit_cnt_p().bits(stop_bits_cfg) 
         .cr_utx_frm_en().clear_bit() // [!] freerun off
+        // .cr_utx_len().bits(1) // todo
         .cr_utx_cts_en().clear_bit() // no CTS
         .cr_utx_en().set_bit() // enable TX
     });
@@ -69,9 +70,9 @@ fn main() -> ! {
         .uart_sig_7_sel().bits(3) // rx -> GLB_UART_SIG_FUN_UART0_RXD
     });
     // todo: fifo
-    dp.UART.uart_fifo_config_1.modify(|_, w| unsafe { w
-        .tx_fifo_th().bits(16 - 1)
-    });
+    // dp.UART.uart_fifo_config_1.modify(|_, w| unsafe { w
+    //     .tx_fifo_th().bits(16 - 1)
+    // });
     loop {
         // write data
         // while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() == 0 {}
