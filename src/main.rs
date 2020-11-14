@@ -31,11 +31,9 @@ fn main() -> ! {
     let pin7 = parts.pin7.into_uart_sig7();
     let mux0 = parts.uart_mux0.into_uart0_tx();
     let mux7 = parts.uart_mux7.into_uart0_rx();
-    let mut config = Config::default();
-    config.baudrate = 20000.Bd();
     let mut serial = Serial::uart0(
         dp.UART,
-        config,
+        Config::default().baudrate(20000.Bd()),
         ((pin16, mux0), (pin7, mux7))
     );
     loop {
