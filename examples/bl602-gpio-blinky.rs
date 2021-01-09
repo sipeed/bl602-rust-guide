@@ -1,15 +1,19 @@
 #![no_std]
 #![no_main]
 
-use bl602_hal::{clock::*, pac, prelude::*};
-
 use panic_halt as _;
+use bl602_hal as hal;
+use hal::{
+    clock::{self, SysclkFreq},
+    pac,
+    prelude::*,
+};
 
 #[riscv_rt::entry]
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
     let mut parts = dp.GLB.split();
-    let clocks = Strict::new()
+    let clocks = clock::Strict::new()
         .use_pll(40_000_000u32.Hz())
         .sys_clk(SysclkFreq::Pll160Mhz)
         .freeze(&mut parts.clk_cfg);
