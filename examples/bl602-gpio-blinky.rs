@@ -13,7 +13,7 @@ use hal::{
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
     let mut parts = dp.GLB.split();
-    let clocks = clock::Strict::new()
+    let _clocks = clock::Strict::new()
         .use_pll(40_000_000u32.Hz())
         .sys_clk(SysclkFreq::Pll160Mhz)
         .freeze(&mut parts.clk_cfg);

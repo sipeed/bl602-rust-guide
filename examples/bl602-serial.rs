@@ -13,7 +13,7 @@ use hal::{
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
     let mut parts = dp.GLB.split();
-    let clocks = clock::Strict::new()
+    let _clocks = clock::Strict::new()
         .use_pll(40_000_000u32.Hz())
         .sys_clk(SysclkFreq::Pll160Mhz)
         .uart_clk(UART_PLL_FREQ.Hz())
@@ -49,10 +49,10 @@ fn main() -> ! {
         .cr_urx_rts_sw_mode().clear_bit() // no RTS
         .cr_urx_en().set_bit() // enable RX
     });
-    let pin16 = parts.pin16.into_uart_sig0();
-    let pin7 = parts.pin7.into_uart_sig7();
-    let mux0 = parts.uart_mux0.into_uart0_tx();
-    let mux7 = parts.uart_mux7.into_uart0_rx();
+    let _pin16 = parts.pin16.into_uart_sig0();
+    let _pin7 = parts.pin7.into_uart_sig7();
+    let _mux0 = parts.uart_mux0.into_uart0_tx();
+    let _mux7 = parts.uart_mux7.into_uart0_rx();
     loop {
         // write data
         while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() < 1 {}
