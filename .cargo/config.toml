@@ -2,6 +2,7 @@
 rustflags = [
   "-C", "link-arg=-Tmemory.x",
   "-C", "link-arg=-Tlink.x",
+  "-C", "link-arg=-Thal_defaults.x",
 ]
 runner = "riscv64-unknown-elf-gdb -q -x openocd.gdb"
 # runner = "riscv32-unknown-elf-gdb -q -x openocd.gdb"
