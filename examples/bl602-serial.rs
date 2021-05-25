@@ -1,20 +1,23 @@
 #![no_std]
 #![no_main]
 
-use bl602_hal::pac;
-
 use panic_halt as _;
+use bl602_hal as hal;
+use hal::{
+    clock::{self, SysclkFreq, UART_PLL_FREQ},
+    pac,
+    prelude::*,
+};
 
 #[riscv_rt::entry]
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
-    // enable clock
-    // let clock = 160_000_000 as u32;
-    let uart_clk_div = 3; // reset
-    dp.GLB.clk_cfg2.write(|w| unsafe { w
-        .uart_clk_div().bits(uart_clk_div)
-        .uart_clk_en().set_bit()
-    });
+    let mut parts = dp.GLB.split();
+    let _clocks = clock::Strict::new()
+        .use_pll(40_000_000u32.Hz())
+        .sys_clk(SysclkFreq::Pll160Mhz)
+        .uart_clk(UART_PLL_FREQ.Hz())
+        .freeze(&mut parts.clk_cfg);
     // calculate baudrate
     let baudrate_divisor = 2000;  // 160M / 4 / 2000 = 20K baud
     dp.UART.uart_bit_prd.write(|w| unsafe { w
@@ -46,29 +49,10 @@ fn main() -> ! {
         .cr_urx_rts_sw_mode().clear_bit() // no RTS
         .cr_urx_en().set_bit() // enable RX
     });
-    // set gpio configuration
-    // tx pin
-    dp.GLB.gpio_cfgctl8.modify(|_, w| unsafe { w
-        .reg_gpio_16_func_sel().bits(7) // GPIO_FUN_UART
-        .reg_gpio_16_ie().set_bit() // input
-        .reg_gpio_16_pu().set_bit() // pull up enable
-        .reg_gpio_16_pd().clear_bit()
-        .reg_gpio_16_drv().bits(0) // disabled
-        .reg_gpio_16_smt().clear_bit()
-    });
-    // rx pin
-    dp.GLB.gpio_cfgctl3.modify(|_, w| unsafe { w
-        .reg_gpio_7_func_sel().bits(7) // GPIO_FUN_UART
-        .reg_gpio_7_ie().set_bit() // input
-        .reg_gpio_7_pu().set_bit() // pull up enable
-        .reg_gpio_7_pd().clear_bit()
-        .reg_gpio_7_drv().bits(0) // disabled
-        .reg_gpio_7_smt().clear_bit()
-    });
-    dp.GLB.uart_sig_sel_0.write(|w| unsafe { w
-        .uart_sig_0_sel().bits(2) // tx -> GLB_UART_SIG_FUN_UART0_TXD
-        .uart_sig_7_sel().bits(3) // rx -> GLB_UART_SIG_FUN_UART0_RXD
-    });
+    let _pin16 = parts.pin16.into_uart_sig0();
+    let _pin7 = parts.pin7.into_uart_sig7();
+    let _mux0 = parts.uart_mux0.into_uart0_tx();
+    let _mux7 = parts.uart_mux7.into_uart0_rx();
     loop {
         // write data
         while dp.UART.uart_fifo_config_1.read().tx_fifo_cnt().bits() < 1 {}

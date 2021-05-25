@@ -1,16 +1,24 @@
 #![no_std]
 #![no_main]
 
-use bl602_hal::{serial::*, pac, prelude::*, clock::Strict};
-
 use panic_halt as _;
+use bl602_hal as hal;
+use hal::{
+    clock::{self, SysclkFreq, UART_PLL_FREQ},
+    serial::{Serial, Config},
+    pac,
+    prelude::*,
+};
 
 #[riscv_rt::entry]
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
     let mut parts = dp.GLB.split();
     // enable clock
-    let clocks = Strict::new()
+    let clocks = clock::Strict::new()
+        .use_pll(40_000_000u32.Hz())
+        .sys_clk(SysclkFreq::Pll160Mhz)
+        .uart_clk(UART_PLL_FREQ.Hz())
         .freeze(&mut parts.clk_cfg);
     let pin16 = parts.pin16.into_uart_sig0();
     let pin7 = parts.pin7.into_uart_sig7();
